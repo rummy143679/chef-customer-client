@@ -1,0 +1,82 @@
+/* #root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+} */
+
+/* navbar css */
+
+/* Smooth link hover effect */
+.nav-link-hover {
+  position: relative;
+  transition: all 0.3s ease-in-out;
+}
+.nav-link-hover:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  transform: translateY(-2px);
+}
+
+/* Dropdown hover effect */
+.dropdown-hover:hover {
+  color: #fff !important;
+}
+
+/* Optional: add smooth dropdown animation */
+.dropdown-menu {
+  transition: all 0.3s ease-in-out;
+}
+.dropdown-menu.show {
+  animation: fadeInDown 0.3s ease-in-out;
+}
+
+/* Keyframes (for dropdown fadeInDown) */
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
