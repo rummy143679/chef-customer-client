@@ -4,7 +4,6 @@ function AdminDashboard() {
   return (
     <>
       {/* Statistic Cards */}
-      <div className="container-fluid min-vh-100 bg-light">
         <div className="row g-4 mb-4">
           <div className="col-md-4">
             <div className="card border-primary shadow-sm h-100 text-center">
@@ -134,7 +133,6 @@ function AdminDashboard() {
             </div>
           </div>
         </div>
-      </div>
     </>
   );
 }
