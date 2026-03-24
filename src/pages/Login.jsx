@@ -1,6 +1,6 @@
 import { useState } from "react";
 import api from "../middleware/API";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { loginSuccess } from "../store/authstore";
 import { useDispatch } from "react-redux";
 import {
@@ -64,7 +64,7 @@ function Login() {
         console.error(err);
         toast.error("Unable to fetch location.");
       },
-      { enableHighAccuracy: true }
+      { enableHighAccuracy: true },
     );
   };
 
@@ -96,7 +96,7 @@ function Login() {
           loginSuccess({
             user,
             token,
-          })
+          }),
         );
         toast.success(response.message || "Login successful");
         if (user.role === "delivery") {
@@ -186,6 +186,20 @@ function Login() {
                 <FaSignInAlt className="me-2" />
                 Login
               </button>
+            </div>
+            <div className="d-flex flex-column justify-content-center align-item-center mt-4 text-center">
+              <Link
+                to="/forgotPassword"
+                className="text-decoration-none text-info fw-semibold small mb-3"
+              >
+                Forgot password
+              </Link>
+              <Link
+                to="/register"
+                className="text-decoration-none text-info fw-semibold small"
+              >
+                Don't have an account? Register here!
+              </Link>
             </div>
           </form>
         </div>

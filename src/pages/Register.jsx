@@ -1,7 +1,13 @@
 import { useState } from "react";
 import api from "../middleware/API";
-import { useNavigate } from "react-router-dom";
-import { FaUser, FaLock, FaPhone, FaUserShield, FaEnvelope } from "react-icons/fa";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  FaUser,
+  FaLock,
+  FaPhone,
+  FaUserShield,
+  FaEnvelope,
+} from "react-icons/fa";
 import { toast } from "react-toastify";
 
 function Register() {
@@ -208,6 +214,14 @@ function Register() {
               >
                 Register
               </button>
+            </div>
+            <div className="d-flex justify-content-center align-item-center mt-3 text-center px-3">
+              <Link
+                to="/login"
+                className="text-decoration-none text-info fw-semibold small"
+              >
+                Have an account? Login here!
+              </Link>
             </div>
           </form>
         </div>
