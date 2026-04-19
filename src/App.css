@@ -1,3 +1,29 @@
+.stat-card {
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transition: 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+/* 🍽️ Total Dishes */
+.gradient-dishes {
+  background: linear-gradient(330deg, #8fe7f5, #20c997);
+}
+
+/* 📦 Orders Today */
+.gradient-orders {
+  background: linear-gradient(330deg, #efa366, #ff5722);
+}
+
+/* ⭐ Rating */
+.gradient-rating {
+  background: linear-gradient(330deg, #ffc107, #ff9800);
+}
+
+
 /* #root {
   max-width: 1280px;
   margin: 0 auto;
