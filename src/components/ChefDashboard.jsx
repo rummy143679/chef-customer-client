@@ -4,6 +4,7 @@ import api from "../middleware/API";
 import { useEffect } from "react";
 import { useCallback } from "react";
 import { useMemo } from "react";
+import StatCard from "./chef-componenets/StatCard";
 
 // Chef Dashboard Component
 
@@ -59,30 +60,28 @@ function ChefDashboard() {
   // orders pagination
   const OrderCurrentPageChange = (e) => {
     const newPage = parseInt(e.target.value);
-    if (
-      newPage >= 1 &&
-      newPage <= Math.ceil(orderPagination.total / orderPagination.itemsPerPage)
-    ) {
-      setOrderPagination({ ...orderPagination, currentPage: newPage });
-    }
+    setOrderPagination((prev) => ({ ...prev, currentPage: newPage }));
   };
 
   const fetchOrders = useCallback(async () => {
     try {
-      const res = await api.get("/orders");
-      // console.log("orders",res.data);
+      const res = await api.post("/orders", orderPagination);
       setOrders(res.data.orders);
+      setOrderPagination((prev) => ({
+        ...prev,
+        total: res.data.pagination.total,
+      }));
     } catch (err) {
-      console.log(err);
+      toast.error(err.message || "Failed to fetch orders");
+      console.error("Error fetching orders:", err);
     }
-  }, []);
+  }, [orderPagination.currentPage, orderPagination.itemsPerPage]);
 
   const itemsToPrepare = useCallback(async (order) => {
     setItemsToFinish(order);
-    console.log(order);
     const modalElement = itemsModalRef.current;
-    const modalInstance = new window.bootstrap.Modal(modalElement);
-    modalInstance.show();
+    // const modalInstance = new window.bootstrap.Modal(modalElement);
+    openModal(modalElement);
   });
 
   async function updateStatus(item, status) {
@@ -94,7 +93,7 @@ function ChefDashboard() {
       if (res.data) {
         // Update item status locally
         const updatedItems = itemsTofinish.items.map((i) =>
-          i._id === item._id ? { ...i, makingStatus: status } : i
+          i._id === item._id ? { ...i, makingStatus: status } : i,
         );
 
         setItemsToFinish((prevOrder) => ({
@@ -104,7 +103,7 @@ function ChefDashboard() {
 
         // Check if all items are completed
         const allCompleted = updatedItems.every(
-          (i) => i.makingStatus === "completed"
+          (i) => i.makingStatus === "completed",
         );
 
         if (allCompleted) {
@@ -173,10 +172,13 @@ function ChefDashboard() {
 
   function editDishes(dishToEdit) {
     setEditingDish(true);
-    setNewDish(dishToEdit);
+    setNewDish(() => ({
+      ...dishToEdit,
+      available: dishToEdit.available ? "Yes" : "No",
+    }));
     const modalElement = modalRef.current;
-    const modalInstance = window.bootstrap.Modal.getInstance(modalElement);
-    modalInstance.show();
+    openModal(modalElement);
+    console.log("Editing Dish:", newDish);
   }
 
   async function deleteDish() {
@@ -228,44 +230,72 @@ function ChefDashboard() {
   useEffect(() => {
     fetchDishes();
     fetchOrders();
-  }, [fetchDishes]);
+  }, [fetchDishes, fetchOrders]);
 
   // dishes table columns
   const dishColumns = ["Name", "Description", "Price", "Available", "Actions"];
+
+  const statData = [
+    {
+      title: "Total Dishes",
+      value: "25",
+      icon: "bi-basket3",
+      gradient: "gradient-dishes",
+    },
+    {
+      title: "Orders Today",
+      value: "12",
+      icon: "bi-card-checklist",
+      gradient: "gradient-orders",
+    },
+    {
+      title: "Rating",
+      value: "4.8",
+      icon: "bi-star",
+      gradient: "gradient-rating",
+    },
+  ];
+
+  const openModal = (modalElement) => {
+    // const modalElement = modalRef.current;
+
+    const modalInstance =
+      window.bootstrap.Modal.getInstance(modalElement) ||
+      new window.bootstrap.Modal(modalElement); // ✅ create if not exists
+
+    modalInstance.show();
+  };
+
+  useEffect(() => {
+    const modalEl = modalRef.current;
+
+    modalEl.addEventListener("hidden.bs.modal", () => {
+      setNewDish({
+        name: "",
+        description: "",
+        price: "",
+        available: "",
+        category: "",
+        subCategory: "",
+        image: "",
+      });
+    });
+  }, []);
+
   return (
     <>
       <div className="row">
         {/* Statistic Cards */}
         <div className="row g-4 mb-4">
-          <div className="col-md-4">
-            <div className="card border-primary shadow-sm h-100 text-center">
-              <div className="card-body">
-                <i className="bi bi-basket3 fs-2 text-primary"></i>
-                <h5 className="fw-semibold mt-2">Total Dishes</h5>
-                <p className="fs-4 fw-bold">25</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-md-4">
-            <div className="card border-success shadow-sm h-100 text-center">
-              <div className="card-body">
-                <i className="bi bi-card-checklist fs-2 text-success"></i>
-                <h5 className="fw-semibold mt-2">Orders Today</h5>
-                <p className="fs-4 fw-bold">12</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-md-4">
-            <div className="card border-warning shadow-sm h-100 text-center">
-              <div className="card-body">
-                <i className="bi bi-star fs-2 text-warning"></i>
-                <h5 className="fw-semibold mt-2">Rating</h5>
-                <p className="fs-4 fw-bold">4.8 ⭐</p>
-              </div>
-            </div>
-          </div>
+          {statData.map((stat, index) => (
+            <StatCard
+              key={index}
+              title={stat.title}
+              value={stat.value}
+              icon={stat.icon}
+              gradient={stat.gradient}
+            />
+          ))}
         </div>
 
         {/* orders table */}
@@ -306,22 +336,22 @@ function ChefDashboard() {
                               item.status === "Completed"
                                 ? "success"
                                 : item.status === "Pending"
-                                ? "warning"
-                                : "secondary"
+                                  ? "warning"
+                                  : "secondary"
                             }`}
                           >
                             {item.status}
                           </span>
                         </td>
                         {/* <td>
-                          <button
-                            className="btn btn-sm btn-outline-success me-1"
-                            onClick={() => markOrderDone(item)}
-                            disabled={item.status === "Completed"}
-                          >
-                            Mark Done
-                          </button>
-                        </td> */}
+                            <button
+                              className="btn btn-sm btn-outline-success me-1"
+                              onClick={() => markOrderDone(item)}
+                              disabled={item.status === "Completed"}
+                            >
+                              Mark Done
+                            </button>
+                          </td> */}
                       </tr>
                     ))
                   )}
@@ -341,7 +371,7 @@ function ChefDashboard() {
                   to{" "}
                   {Math.min(
                     orderPagination.currentPage * orderPagination.itemsPerPage,
-                    orderPagination.total
+                    orderPagination.total,
                   )}{" "}
                   of {orderPagination.total}
                 </small>
@@ -400,14 +430,14 @@ function ChefDashboard() {
                 <button
                   className="btn btn-outline-secondary btn-sm"
                   onClick={() =>
-                    setOrderPagination((prev) => ({
-                      ...prev,
-                      currentPage:
-                        prev.currentPage + 1 >=
-                        Math.ceil(prev.total / prev.itemsPerPage) + 1
-                          ? prev.currentPage
-                          : prev.currentPage + 1,
-                    }))
+                    setOrderPagination((prev) => {
+                      const maxPage = Math.ceil(prev.total / prev.itemsPerPage);
+
+                      return {
+                        ...prev,
+                        currentPage: Math.min(prev.currentPage + 1, maxPage),
+                      };
+                    })
                   }
                 >
                   Next
@@ -476,12 +506,12 @@ function ChefDashboard() {
                             >
                               Accept
                             </button>
-                            <button
+                            {/* <button
                               className="btn btn-sm btn-outline-danger"
                               onClick={() => updateStatus(item, "rejected")}
                             >
                               Reject
-                            </button>
+                            </button> */}
                           </>
                         )}
 
@@ -493,12 +523,12 @@ function ChefDashboard() {
                             >
                               Start Cooking
                             </button>
-                            <button
+                            {/* <button
                               className="btn btn-sm btn-outline-danger"
                               onClick={() => updateStatus(item, "rejected")}
                             >
                               Reject
-                            </button>
+                            </button> */}
                           </>
                         )}
 
@@ -529,8 +559,8 @@ function ChefDashboard() {
                   Cancel
                 </button>
                 {/* <button className="btn btn-success" data-bs-dismiss="modal">
-                  Completed
-                </button> */}
+                    Completed
+                  </button> */}
               </div>
             </div>
           </div>
@@ -538,7 +568,7 @@ function ChefDashboard() {
 
         {/* My Dishes Table */}
         {/* dish should not be delete but it has to move to offline
-        we have to show only online dishes */}
+          we have to show only online dishes */}
         {/* My Dishes Table */}
         <div className="card shadow-sm mb-4">
           <div className="card-body">
@@ -546,10 +576,9 @@ function ChefDashboard() {
               <h5 className="fw-bold">My Dishes</h5>
               <button
                 className="btn btn-primary btn-sm"
-                data-bs-toggle="modal"
-                data-bs-target="#addDishModal"
                 onClick={() => {
                   setEditingDish(false);
+                  openModal(modalRef.current);
                 }}
               >
                 + Add New Dish
@@ -625,7 +654,7 @@ function ChefDashboard() {
                   to{" "}
                   {Math.min(
                     pagination.currentPage * pagination.itemsPerPage,
-                    pagination.total
+                    pagination.total,
                   )}{" "}
                   of {pagination.total}
                 </small>
@@ -797,10 +826,10 @@ function ChefDashboard() {
                         className="form-select"
                         name="available"
                         onChange={handleNewDish}
-                        value={newDish.available ? "Yes" : "No"}
+                        value={newDish.available}
                       >
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
+                        <option value={"Yes"}>Yes</option>
+                        <option value={"No"}>No</option>
                       </select>
                     </div>
                   </div>
@@ -819,9 +848,9 @@ function ChefDashboard() {
                         </option>
                       ))}
                       {/* <option value="Veg">Veg</option>
-                      <option value="Non-Veg">Non-Veg</option>
-                      <option value="Beverage">Beverage</option>
-                      <option value="Dessert">Dessert</option> */}
+                        <option value="Non-Veg">Non-Veg</option>
+                        <option value="Beverage">Beverage</option>
+                        <option value="Dessert">Dessert</option> */}
                     </select>
                   </div>
 
@@ -839,7 +868,7 @@ function ChefDashboard() {
                           <option key={subCategory} value={subCategory}>
                             {subCategory}
                           </option>
-                        )
+                        ),
                       )}
                     </select>
                   </div>

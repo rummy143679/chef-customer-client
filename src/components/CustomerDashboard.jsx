@@ -30,7 +30,7 @@ function CustomerDashboard() {
     await api
       .get("/category-wise")
       .then((response) => {
-        setCategoryWiseItems(response.data.data);
+        setCategoryWiseItems(response.data.data); 
       })
       .catch((e) => {
         toast.error(e.message);
