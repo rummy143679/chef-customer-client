@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useCallback } from "react";
 import { useMemo } from "react";
 import StatCard from "./chef-componenets/StatCard";
+import { Modal } from "bootstrap";
 
 // Chef Dashboard Component
 
@@ -77,12 +78,17 @@ function ChefDashboard() {
     }
   }, [orderPagination.currentPage, orderPagination.itemsPerPage]);
 
-  const itemsToPrepare = useCallback(async (order) => {
+  // const itemsToPrepare = useCallback(async (order) => {
+  //   setItemsToFinish(order);
+  //   const modalElement = itemsModalRef.current;
+  //   // const modalInstance = new window.bootstrap.Modal(modalElement);
+  //   openModal(modalElement);
+  // });
+
+  const itemsToPrepare = (order) => {
     setItemsToFinish(order);
-    const modalElement = itemsModalRef.current;
-    // const modalInstance = new window.bootstrap.Modal(modalElement);
-    openModal(modalElement);
-  });
+    openModal(itemsModalRef.current);
+  };
 
   async function updateStatus(item, status) {
     try {
@@ -129,7 +135,6 @@ function ChefDashboard() {
     }
   }
 
-
   // new dish adding begins
   function handleNewDish(e) {
     const { name, value } = e.target;
@@ -154,7 +159,6 @@ function ChefDashboard() {
   }
 
   function handleModalClose() {
-    // Reset the form
     setNewDish({
       name: "",
       description: "",
@@ -164,39 +168,35 @@ function ChefDashboard() {
       subCategory: "",
       image: "",
     });
-    // Close the modal
-    const modalElement = modalRef.current;
-    const modalInstance = window.bootstrap.Modal.getInstance(modalElement);
-    modalInstance.hide();
+
+    const modalInstance = Modal.getInstance(modalRef.current);
+    modalInstance?.hide();
   }
 
   function editDishes(dishToEdit) {
     setEditingDish(true);
-    setNewDish(() => ({
+
+    setNewDish({
       ...dishToEdit,
       available: dishToEdit.available ? "Yes" : "No",
-    }));
-    const modalElement = modalRef.current;
-    openModal(modalElement);
-    console.log("Editing Dish:", newDish);
+    });
+
+    openModal(modalRef.current);
   }
 
   async function deleteDish() {
-    const deleteModalElement = deleteModalRef.current;
-    const deleteModalInstance =
-      window.bootstrap.Modal.getInstance(deleteModalElement);
-    if (deleteItem) {
-      await api
-        .delete(`/delete-dish/${deleteItem._id}`)
-        .then((response) => {
-          toast.success(`Dish "${deleteItem.name}" deleted successfully`);
-          deleteModalInstance.hide();
-          fetchDishes();
-        })
-        .catch((error) => {
-          toast.error("Failed to delete dish");
-          console.error("Error deleting dish:", error.message);
-        });
+    if (!deleteItem) return;
+
+    try {
+      await api.delete(`/delete-dish/${deleteItem._id}`);
+      toast.success(`Dish "${deleteItem.name}" deleted`);
+
+      const modalInstance = Modal.getInstance(deleteModalRef.current);
+      modalInstance?.hide();
+
+      fetchDishes();
+    } catch (err) {
+      toast.error("Delete failed");
     }
   }
 
@@ -257,11 +257,10 @@ function ChefDashboard() {
   ];
 
   const openModal = (modalElement) => {
-    // const modalElement = modalRef.current;
+    if (!modalElement) return;
 
     const modalInstance =
-      window.bootstrap.Modal.getInstance(modalElement) ||
-      new window.bootstrap.Modal(modalElement); // ✅ create if not exists
+      Modal.getInstance(modalElement) || new Modal(modalElement);
 
     modalInstance.show();
   };
@@ -628,9 +627,10 @@ function ChefDashboard() {
                           </button>
                           <button
                             className="btn btn-sm btn-outline-danger"
-                            data-bs-toggle="modal"
-                            data-bs-target="#deleteDishModal"
-                            onClick={() => setDeleteItem(item)}
+                            onClick={() => {
+                              setDeleteItem(item);
+                              openModal(deleteModalRef.current);
+                            }}
                           >
                             Delete
                           </button>
