@@ -17,7 +17,4 @@ If you are developing a production application, we recommend using TypeScript wi
 
 
 
-<<<<<<< HEAD
-=======
 <!-- https://www.figma.com/make/LSNOV0jbVT44OOZBVvttd0/Chef-Dashboard?fullscreen=1&t=C7TOV8VzkjCKUuID-1 -->
->>>>>>> chef-dashboard-ui

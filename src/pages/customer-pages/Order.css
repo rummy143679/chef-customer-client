@@ -1,0 +1,107 @@
+/* Fade-in and slide up animation for total items */
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* Pulse and highlight animation for total amount */
+
+.animate-pulse-highlight {
+    animation: pulseHighlight 1.5s ease-in-out infinite;
+    color: #28a745;
+    text-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
+}
+
+@keyframes pulseHighlight {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        text-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
+    }
+    50% {
+        opacity: 0.9;
+        transform: scale(1.05);
+        text-shadow: 0 0 15px rgba(40, 167, 69, 0.6);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        text-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
+    }
+}
+
+
+/* Optional: Add hover effect to the entire card for better UX */
+
+.card {
+    transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+
+/* Horizontal scrollable container for orders */
+
+.orders-scroll-container {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.5rem;
+    scroll-behavior: smooth;
+}
+
+
+/* Custom scrollbar styling */
+
+.orders-scroll-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.orders-scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.orders-scroll-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.orders-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+
+/* Order card wrapper to prevent flex shrinking */
+
+.order-card-wrapper {
+    flex: 0 0 auto;
+    min-width: 350px;
+    width: 350px;
+}
+
+
+/* Ensure responsive on smaller screens */
+
+@media (max-width: 768px) {
+    .order-card-wrapper {
+        min-width: 280px;
+        width: 280px;
+    }
+}

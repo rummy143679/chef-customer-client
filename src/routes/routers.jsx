@@ -6,8 +6,11 @@ import ChefDashboard from "../components/ChefDashboard.jsx";
 import AdminDashboard from "../components/AdminDashboard.jsx";
 import Home from "../components/Home.jsx";
 import Order from "../pages/customer-pages/Order.jsx";
+import Navbar from "../components/Navbar.jsx";
 
 // Define default routes accessible to all users
+
+const user = JSON.parse(localStorage.getItem("user"));
 const defaultRoute = [
   {
     path: "/login",
@@ -26,6 +29,7 @@ const roles = {
       element: (
         <Authetication>
           {/* <CustomerDashboard /> */}
+          <Navbar role={user.role} />
           <Home />
         </Authetication>
       ),
@@ -35,6 +39,7 @@ const roles = {
       element: (
         <Authetication>
           {/* <CustomerDashboard /> */}
+          <Navbar role={user.role} />
           <Order />
         </Authetication>
       ),
@@ -47,6 +52,7 @@ const roles = {
       element: (
         <Authetication>
           {/* <ChefDashboard /> */}
+          <Navbar role={user.role} />
           <Home />
         </Authetication>
       ),
@@ -59,6 +65,7 @@ const roles = {
       element: (
         <Authetication>
           {/* <AdminDashboard /> */}
+          <Navbar role={user.role} />
           <Home />
         </Authetication>
       ),
@@ -71,6 +78,7 @@ const roles = {
       element: (
         <Authetication>
           {/* <AdminDashboard /> */}
+          <Navbar role={user.role} />
           <Home />
         </Authetication>
       ),

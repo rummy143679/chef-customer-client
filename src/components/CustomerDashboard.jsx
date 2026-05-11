@@ -3,6 +3,7 @@ import api from "../middleware/API";
 import { toast } from "react-toastify";
 import OrderButton from "./customer-componenets/OrderButton";
 import { useNavigate } from "react-router-dom";
+import { Modal } from "bootstrap";
 
 function CustomerDashboard() {
   const [topItemsFromEachCategory, setTopItemsFromEachCategory] = useState([]);
@@ -30,7 +31,7 @@ function CustomerDashboard() {
     await api
       .get("/category-wise")
       .then((response) => {
-        setCategoryWiseItems(response.data.data); 
+        setCategoryWiseItems(response.data.data);
       })
       .catch((e) => {
         toast.error(e.message);
@@ -75,8 +76,10 @@ function CustomerDashboard() {
 
   const handleOrders = useCallback(() => {
     const ordersModal = ordersModalRef.current;
+    if (!ordersModal) return;
     const modalInstance =
-      window.bootstrap.Modal.getOrCreateInstance(ordersModal);
+      Modal.getInstance(ordersModal) || new Modal(ordersModal);
+
     modalInstance.show();
   }, []);
 
@@ -93,7 +96,7 @@ function CustomerDashboard() {
             }
             return item;
           })
-          .filter((item) => item.quantity > 0) // remove if quantity becomes 0
+          .filter((item) => item.quantity > 0), // remove if quantity becomes 0
     );
     console.log(cartItems);
   }, []);
@@ -108,7 +111,7 @@ function CustomerDashboard() {
     try {
       const totalAmount = cartItems.reduce(
         (sum, item) => sum + item.price * (item.quantity || 1),
-        0
+        0,
       );
 
       let customerLocation = { lat: 0, lng: 0 }; // fallback
@@ -126,7 +129,7 @@ function CustomerDashboard() {
               console.error("Location error:", err);
               resolve(); // allow payment even if location fails
             },
-            { enableHighAccuracy: true }
+            { enableHighAccuracy: true },
           );
         });
       }
@@ -166,7 +169,7 @@ function CustomerDashboard() {
               items: itemsCopy,
               totalAmount,
               customerId: JSON.parse(localStorage.getItem("user"))?._id,
-              customerLocation
+              customerLocation,
             });
 
             if (result.data.success) {
@@ -253,7 +256,7 @@ function CustomerDashboard() {
         <section
           className="menu-section bg-light py-4 mb-5"
           style={{ height: "50vh" }}
-        >
+        >   
           <div className="container-fluid">
             <div className="d-flex justify-content-between align-items-center mb-3 px-3">
               <h3 className="fw-bold mb-0">Explore top menu 🍴</h3>
@@ -506,7 +509,7 @@ function CustomerDashboard() {
                         .reduce(
                           (sum, item) =>
                             sum + item.price * (item.quantity || 1),
-                          0
+                          0,
                         )
                         .toFixed(2)}
                     </h5>

@@ -3,36 +3,89 @@ import { FaUtensils, FaUser, FaSignOutAlt, FaGlobe } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../middleware/API";
+import { useEffect } from "react";
+import * as bootstrap from "bootstrap";
+
+/* ================= MENU CONFIG ================= */
+
+const menuConfig = {
+  customer: [
+    {
+      title: "Services",
+      items: [
+        { name: "Menu", path: "/" },
+        { name: "My Orders", path: "/orders" },
+      ],
+    },
+  ],
+  chef: [
+    {
+      title: "Services",
+      items: [
+        { name: "My Dishes", path: "/my-dishes" },
+        { name: "Inventory", path: "/add-dish" },
+      ],
+    },
+  ],
+  delivery: [
+    {
+      title: "Delivery",
+      items: [
+        { name: "Orders", path: "/orders" },
+        { name: "Profile", path: "/profile" },
+      ],
+    },
+  ],
+  admin: [
+    {
+      title: "Admin",
+      items: [
+        { name: "Manage Users", path: "/manage-users" },
+        { name: "Manage Chefs", path: "/manage-chefs" },
+        { name: "Manage Dishes", path: "/manage-dishes" },
+        { name: "Profile", path: "/profile" },
+      ],
+    },
+  ],
+};
+
+const commonMenus = [
+  {
+    title: "Profile",
+    icon: <FaUser className="me-1" />,
+    items: [
+      { name: "My Profile", path: "/profile" },
+      { name: "Logout", action: "logout" },
+    ],
+  },
+  {
+    title: "Languages",
+    icon: <FaGlobe className="me-1" />,
+    items: [
+      { name: "English", path: "#" },
+      { name: "Telugu", path: "#" },
+      { name: "French", path: "#" },
+      { name: "Hindi", path: "#" },
+    ],
+  },
+];
+
+/* ================= COMPONENT ================= */
 
 function Navbar({ role }) {
   const navigate = useNavigate();
-
-  // function handleLogout() {
-  //   // Clear auth data
-  //   localStorage.removeItem("token");
-  //   localStorage.removeItem("user"); // (if stored)
-
-  //   // Or clear EVERYTHING:
-  //   // localStorage.clear();
-
-  //   // Redirect to login page
-  //   navigate("/login");
-  // }
 
   async function handleLogout() {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
 
-      // Remove from available delivery boys
       if (user?.role === "delivery") {
         await api.post("/delivery-boy/logout", { userId: user._id });
       }
 
-      // Clear local storage
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
-      // Redirect to login
       navigate("/login");
       toast.success("Logged out successfully");
     } catch (err) {
@@ -41,222 +94,115 @@ function Navbar({ role }) {
     }
   }
 
+  useEffect(() => {
+    // Initialize all dropdowns
+    const dropdownTriggerList = document.querySelectorAll(
+      '[data-bs-toggle="dropdown"]',
+    );
+    dropdownTriggerList.forEach((dropdownTriggerEl) => {
+      new bootstrap.Dropdown(dropdownTriggerEl);
+    });
+
+    // Initialize navbar collapse (burger menu)
+    const collapseTriggerList = document.querySelectorAll(
+      '[data-bs-toggle="collapse"]',
+    );
+    collapseTriggerList.forEach((collapseTriggerEl) => {
+      new bootstrap.Collapse(collapseTriggerEl);
+    });
+  }, []);
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-info px-3 shadow-sm sticky-top mb-4">
       <div className="container-fluid">
+        {/* LOGO */}
         <Link
           className="navbar-brand fw-bold text-white d-flex align-items-center"
           to="/"
         >
-          <FaUtensils className="me-2 animate__animated animate__bounce" />
+          <FaUtensils className="me-2" />
           Foodie Hub
         </Link>
 
-        {/* Toggler Button */}
+        {/* TOGGLER */}
         <button
           className="navbar-toggler border-0"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Nav Links */}
+        {/* NAV ITEMS */}
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
-            {/* Common Links */}
+            {/* HOME */}
             <li className="nav-item">
-              <Link className="nav-link nav-link-hover text-white" to="/">
+              <Link className="nav-link text-white" to="/">
                 Home
               </Link>
             </li>
-            {/* <li className="nav-item">
-              <Link className="nav-link nav-link-hover text-white" to="/profile">
-                Profile
-              </Link>
-            </li> */}
 
-            {/* Role-Specific Dropdowns */}
-            {role === "customer" && (
-              <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle text-white dropdown-hover"
-                  href="#"
-                  role="button"
+            {/* ROLE BASED MENUS */}
+            {menuConfig[role]?.map((menu, index) => (
+              <li className="nav-item dropdown" key={index}>
+                <button
+                  type="button"
+                  className="nav-link dropdown-toggle text-white btn btn-link"
                   data-bs-toggle="dropdown"
+                  aria-expanded="false"
                 >
-                  Services
-                </a>
-                <ul className="dropdown-menu dropdown-menu-end animate__animated animate__fadeInDown">
-                  <li>
-                    <Link className="dropdown-item" to="/menu">
-                      Menu
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="dropdown-item" to="/orders">
-                      My Orders
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="dropdown-item" to="/profile">
-                      Cart
-                    </Link>
-                  </li>
+                  {menu.title}
+                </button>
+
+                <ul className="dropdown-menu dropdown-menu-end">
+                  {menu.items.map((item, i) => (
+                    <li key={i}>
+                      <Link className="dropdown-item" to={item.path}>
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
                 </ul>
               </li>
-            )}
+            ))}
 
-            {role === "chef" && (
-              <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle text-white dropdown-hover"
-                  href="#"
-                  role="button"
+            {/* COMMON MENUS */}
+            {commonMenus.map((menu, index) => (
+              <li className="nav-item dropdown" key={index}>
+                <button
+                  type="button"
+                  className="nav-link dropdown-toggle text-white btn btn-link d-flex align-items-center"
                   data-bs-toggle="dropdown"
                 >
-                  Services
-                </a>
-                <ul className="dropdown-menu dropdown-menu-end animate__animated animate__fadeInDown">
-                  <li>
-                    <Link className="dropdown-item" to="/my-dishes">
-                      My Dishes
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="dropdown-item" to="/add-dish">
-                      Inventory
-                    </Link>
-                  </li>
+                  {menu.icon}
+                  {menu.title}
+                </button>
+
+                <ul className="dropdown-menu dropdown-menu-end">
+                  {menu.items.map((item, i) => (
+                    <li key={i}>
+                      {item.action === "logout" ? (
+                        <button
+                          className="dropdown-item text-danger"
+                          onClick={handleLogout}
+                        >
+                          <FaSignOutAlt className="me-2" />
+                          {item.name}
+                        </button>
+                      ) : (
+                        <Link className="dropdown-item" to={item.path}>
+                          {item.name}
+                        </Link>
+                      )}
+                    </li>
+                  ))}
                 </ul>
               </li>
-            )}
-
-            {role === "delivery" && (
-              <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle text-white dropdown-hover"
-                  href="#"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                >
-                  Delivery
-                </a>
-                <ul className="dropdown-menu dropdown-menu-end animate__animated animate__fadeInDown">
-                  <li>
-                    <Link className="dropdown-item" to="/orders">
-                      Orders
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="dropdown-item" to="/profile">
-                      Profile
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-            )}
-
-            {role === "admin" && (
-              <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle text-white dropdown-hover"
-                  href="#"
-                  role="button"
-                  data-bs-toggle="dropdown"
-                >
-                  Admin
-                </a>
-                <ul className="dropdown-menu dropdown-menu-end animate__animated animate__fadeInDown">
-                  <li>
-                    <Link className="dropdown-item" to="/manage-users">
-                      Manage Users
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="dropdown-item" to="/manage-chefs">
-                      Manage Chefs
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="dropdown-item" to="/manage-dishes">
-                      Manage Dishes
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="dropdown-item" to="/profile">
-                      Profile
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-            )}
-
-            {/* Profile & Logout (optional if you want extra profile menu) */}
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle text-white d-flex align-items-center dropdown-hover"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
-                <FaUser className="me-1" />
-                Profile
-              </a>
-              <ul className="dropdown-menu dropdown-menu-end animate__animated animate__fadeInDown">
-                <li>
-                  <Link className="dropdown-item" to="/profile">
-                    My Profile
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    className="dropdown-item text-danger"
-                    onClick={handleLogout}
-                  >
-                    <FaSignOutAlt className="me-2" />
-                    Logout
-                  </button>
-                </li>
-              </ul>
-            </li>
-
-            {/* Profile & Logout (optional if you want extra profile menu) */}
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle text-white d-flex align-items-center dropdown-hover"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
-                {/* <FaUser className="me-1" /> */}
-                <FaGlobe className="me-1" />
-                Languages
-              </a>
-              <ul className="dropdown-menu dropdown-menu-end animate__animated animate__fadeInDown">
-                <li>
-                  <Link className="dropdown-item" to="/profile">
-                    English
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item" to="/profile">
-                    Telugu
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item" to="/profile">
-                    French
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item" to="/profile">
-                    Hindi
-                  </Link>
-                </li>
-              </ul>
-            </li>
+            ))}
           </ul>
         </div>
       </div>
