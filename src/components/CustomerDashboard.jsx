@@ -256,7 +256,7 @@ function CustomerDashboard() {
         <section
           className="menu-section bg-light py-4 mb-5"
           style={{ height: "50vh" }}
-        >
+        >   
           <div className="container-fluid">
             <div className="d-flex justify-content-between align-items-center mb-3 px-3">
               <h3 className="fw-bold mb-0">Explore top menu 🍴</h3>

@@ -15,7 +15,6 @@ const menuConfig = {
       items: [
         { name: "Menu", path: "/" },
         { name: "My Orders", path: "/orders" },
-        { name: "Cart", path: "/profile" },
       ],
     },
   ],
