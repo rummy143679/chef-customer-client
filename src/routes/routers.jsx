@@ -45,7 +45,7 @@ const roles = {
       ),
     },
   ],
-  chef: [
+  provider: [
     ...defaultRoute,
     {
       path: "/home",
@@ -71,7 +71,7 @@ const roles = {
       ),
     },
   ],
-  delivery: [
+  deliveryPartner: [
     ...defaultRoute,
     {
       path: "/home",

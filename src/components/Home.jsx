@@ -17,9 +17,9 @@ function Home() {
         {/* <Navbar role={user.role} /> */}
         <div className="container min-vh-100 bg-light">
           {user.role === "admin" && <AdminDashboard />}
-          {user.role === "chef" && <ChefDashboard />}
+          {user.role === "provider" && <ChefDashboard />}
           {user.role === "customer" && <CustomerDashboard />}
-          {user.role === "delivery" && <DeliveryDashboard />}
+          {user.role === "deliveryPartner" && <DeliveryDashboard />}
         </div>
       </main>
     </>

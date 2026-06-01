@@ -170,10 +170,10 @@ function Login() {
                 defaultValue=""
               >
                 <option value="">Select your role</option>
-                <option value="chef">Chef</option>
+                <option value="provider">Chef</option>
                 <option value="customer">Customer</option>
                 <option value="admin">Admin</option>
-                <option value="delivery">Delivery</option>
+                <option value="deliveryPartner">Delivery Partner</option>
               </select>
             </div>
 

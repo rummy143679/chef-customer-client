@@ -101,6 +101,104 @@ function CustomerDashboard() {
     console.log(cartItems);
   }, []);
 
+  // const handlePayNow = async () => {
+  //   console.log("payment");
+  //   if (cartItems.length === 0) {
+  //     toast.warning("Your cart is empty!");
+  //     return;
+  //   }
+
+  //   try {
+  //     const totalAmount = cartItems.reduce(
+  //       (sum, item) => sum + item.price * (item.quantity || 1),
+  //       0,
+  //     );
+
+  //     let customerLocation = { lat: 0, lng: 0 }; // fallback
+  //     if (navigator.geolocation) {
+  //       await new Promise((resolve, reject) => {
+  //         navigator.geolocation.getCurrentPosition(
+  //           (position) => {
+  //             customerLocation = {
+  //               lat: position.coords.latitude,
+  //               lng: position.coords.longitude,
+  //             };
+  //             resolve();
+  //           },
+  //           (err) => {
+  //             console.error("Location error:", err);
+  //             resolve(); // allow payment even if location fails
+  //           },
+  //           { enableHighAccuracy: true },
+  //         );
+  //       });
+  //     }
+
+  //     // 1️⃣ Create Razorpay order
+  //     const { data } = await api.post("/payment/create", {
+  //       amount: totalAmount,
+  //     });
+
+  //     if (!data.success || !data.order) {
+  //       toast.error("Failed to create payment order.");
+  //       return;
+  //     }
+
+  //     const options = {
+  //       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+  //       amount: data.order.amount, // Already in paise from backend
+  //       currency: "INR",
+  //       order_id: data.order.id,
+  //       name: "Chef Customer",
+  //       description: "Food Order Payment",
+  //       prefill: {
+  //         name: JSON.parse(localStorage.getItem("user"))?.name,
+  //         email: JSON.parse(localStorage.getItem("user"))?.email,
+  //       },
+  //       theme: { color: "#3399cc" },
+
+  //       handler: async function (response) {
+  //         try {
+  //           const itemsCopy = cartItems.map((i) => ({
+  //             ...i,
+  //             makingStatus: "not accepted",
+  //           }));
+
+  //           const result = await api.post("/payment/verify", {
+  //             ...response,
+  //             items: itemsCopy,
+  //             totalAmount,
+  //             customerId: JSON.parse(localStorage.getItem("user"))?._id,
+  //             customerLocation,
+  //           });
+
+  //           if (result.data.success) {
+  //             toast.success("Order placed successfully!");
+  //             setCartItems([]);
+  //             navigate("/orders");
+  //           } else {
+  //             toast.error("Payment verification failed.");
+  //           }
+  //         } catch (err) {
+  //           console.error(err);
+  //           toast.error("Payment verification error.");
+  //         }
+  //       },
+
+  //       modal: {
+  //         ondismiss: function () {
+  //           toast.info("Payment cancelled.");
+  //         },
+  //       },
+  //     };
+
+  //     new window.Razorpay(options).open();
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error("Payment failed!");
+  //   }
+  // };
+
   const handlePayNow = async () => {
     console.log("payment");
     if (cartItems.length === 0) {
@@ -134,65 +232,26 @@ function CustomerDashboard() {
         });
       }
 
-      // 1️⃣ Create Razorpay order
-      const { data } = await api.post("/payment/create", {
-        amount: totalAmount,
+      const itemsCopy = cartItems.map((i) => ({
+        ...i,
+        makingStatus: "not accepted",
+      }));
+
+      const result = await api.post("/payment/verify", {
+        // ...response,
+        items: itemsCopy,
+        totalAmount,
+        customerId: JSON.parse(localStorage.getItem("user"))?._id,
+        customerLocation,
       });
 
-      if (!data.success || !data.order) {
-        toast.error("Failed to create payment order.");
-        return;
+      if (result.data.success) {
+        toast.success("Order placed successfully!");
+        setCartItems([]);
+        navigate("/orders");
+      } else {
+        toast.error("Payment verification failed.");
       }
-
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: data.order.amount, // Already in paise from backend
-        currency: "INR",
-        order_id: data.order.id,
-        name: "Chef Customer",
-        description: "Food Order Payment",
-        prefill: {
-          name: JSON.parse(localStorage.getItem("user"))?.name,
-          email: JSON.parse(localStorage.getItem("user"))?.email,
-        },
-        theme: { color: "#3399cc" },
-
-        handler: async function (response) {
-          try {
-            const itemsCopy = cartItems.map((i) => ({
-              ...i,
-              makingStatus: "not accepted",
-            }));
-
-            const result = await api.post("/payment/verify", {
-              ...response,
-              items: itemsCopy,
-              totalAmount,
-              customerId: JSON.parse(localStorage.getItem("user"))?._id,
-              customerLocation,
-            });
-
-            if (result.data.success) {
-              toast.success("Order placed successfully!");
-              setCartItems([]);
-              navigate("/orders");
-            } else {
-              toast.error("Payment verification failed.");
-            }
-          } catch (err) {
-            console.error(err);
-            toast.error("Payment verification error.");
-          }
-        },
-
-        modal: {
-          ondismiss: function () {
-            toast.info("Payment cancelled.");
-          },
-        },
-      };
-
-      new window.Razorpay(options).open();
     } catch (error) {
       console.error(error);
       toast.error("Payment failed!");
@@ -256,7 +315,7 @@ function CustomerDashboard() {
         <section
           className="menu-section bg-light py-4 mb-5"
           style={{ height: "50vh" }}
-        >   
+        >
           <div className="container-fluid">
             <div className="d-flex justify-content-between align-items-center mb-3 px-3">
               <h3 className="fw-bold mb-0">Explore top menu 🍴</h3>
