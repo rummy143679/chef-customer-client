@@ -4,6 +4,8 @@ import { routers } from "./routes/routers";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import { useSelector } from "react-redux";
 
 //evry user has unique email
@@ -11,7 +13,7 @@ import { useSelector } from "react-redux";
 
 function App() {
   // Get user role from localStorage
-  const user = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state?.auth?.user);
   const role = user?.role ?? null;
 
   //filter routes based on role

@@ -18,7 +18,7 @@ const menuConfig = {
       ],
     },
   ],
-  chef: [
+  provider: [
     {
       title: "Services",
       items: [
@@ -27,7 +27,7 @@ const menuConfig = {
       ],
     },
   ],
-  delivery: [
+  deliveryPartner: [
     {
       title: "Delivery",
       items: [
@@ -79,7 +79,7 @@ function Navbar({ role }) {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
 
-      if (user?.role === "delivery") {
+      if (user?.role === "deliveryPartner") {
         await api.post("/delivery-boy/logout", { userId: user._id });
       }
 

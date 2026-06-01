@@ -19,7 +19,7 @@ function Register() {
     contact: "",
   });
 
-  const roles = ["chef", "customer", "admin", "delivery"];
+  const roles = ["provider", "customer", "admin", "deliveryPartner"];
 
   const messages = {
     username: "only letters, numbers, underscores, 3 to 16 characters",
